@@ -7,3 +7,21 @@
     text-wrap: balance;
   }
 }
+
+@keyframes switchIcons {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+  .animate-icons span {
+    animation: switchIcons 4s linear infinite;
+  }
+  
+  .animate-icons .circle {
+    opacity: 0;
+  }
+  
+  .animate-icons .task_alt {
+    opacity: 1;
+  }
