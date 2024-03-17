@@ -19,7 +19,7 @@ const MapComponent: React.FC = () => {
       const lng = place.geometry.location.lng();
       setCoordinates({ lat, lng });
       setMarkerPosition({ lat, lng });
-      setZoom(18);
+      setZoom(16);
     } else {
       setZoom(8);
     }
@@ -28,11 +28,12 @@ const MapComponent: React.FC = () => {
   return (
     <div>
       <LoadScript
-        googleMapsApiKey={"AIzaSyBPAsRg0mR6lK7UG9dmU5lS9emTFkKN4NU" || ''}
+        googleMapsApiKey={process.env.
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY|| ''}
         libraries={libraries}
       >
         <Autocomplete onLoad={autocomplete => (autocompleteRef.current = autocomplete)} onPlaceChanged={handlePlaceSelect}>
-          <input type="text" placeholder="Enter your location" />
+          <input className="text-binrojizome dark:text-binrojizome" type="text" placeholder="Enter your location" />
         </Autocomplete>
         <GoogleMap
           mapContainerStyle={{ width: '800px', height: '500px' }}
