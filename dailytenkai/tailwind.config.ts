@@ -21,6 +21,8 @@ const config: Config = {
       'binrojizome': '#3a3226',
       'tetsuonando': '#255359',
       'kachi': '#08192d',
+      'ichigo': '#b5495b',
+      'usubeni': '#e87a90'
     }
   },
   plugins: [],
