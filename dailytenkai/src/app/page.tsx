@@ -1,9 +1,11 @@
 
-import ThemeToggle from '../components/ThemeToggle'
+import ThemeToggle from './components/ThemeToggle';
 import 'material-icons/iconfont/material-icons.css';
+import MapComponent from './components/Map';
 
 
 export default function Home() {
+
   return (
     <main className="min-h-screen bg-shironeri dark:bg-kachi">
       <div className='flex flex-row items-center justify-around p-16'>
@@ -17,6 +19,10 @@ export default function Home() {
         <div className='flex flex-row'>
         <span className="material-icons-outlined mr-4">task_alt</span>
         <p>Reach 10k Steps!</p>
+        </div>
+
+        <div className='mb-32'>
+          <MapComponent/>
         </div>
 
       </div>

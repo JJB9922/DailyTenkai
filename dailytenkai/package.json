@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node ./src/app/server.js",
+    "dev": "nodemon ./src/backend/server.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -11,6 +11,7 @@
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.3.42",
     "@googlemaps/js-api-loader": "^1.16.6",
+    "@react-google-maps/api": "^2.19.3",
     "@vis.gl/react-google-maps": "^0.7.1",
     "axios": "^1.6.8",
     "cors": "^2.8.5",
@@ -22,6 +23,8 @@
     "tailwind-easy-theme-switcher": "^1.0.4"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
