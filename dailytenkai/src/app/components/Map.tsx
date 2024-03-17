@@ -43,7 +43,9 @@ const MapComponent: React.FC = () => {
       //distance between 2 points = acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371
       const randomBearingIndex = Math.floor(Math.random() * bearings.length);
       let halfwayPoint = calculateNewCoordinates(coordinates.lat, coordinates.lng,
-                                                 halfDistance, bearings[randomBearingIndex]);
+                                                 halfDistance);
+
+      console.log(halfwayPoint.lat2, ", ", halfwayPoint.lon2);
     }
   };
 

@@ -7,6 +7,9 @@ function toDegrees(radians: number) {
     return radians * 180 / Math.PI;
 }
 
-export default function calculateNewCoordinates(lat1: number, lon1: number, distance: number, bearing: number) {
+export default function calculateNewCoordinates(lat1: number, lon1: number, distance: number) {
+    let lat2 = 0;
+    let lon2 = 0;
 
+    return { lat2, lon2 }
 }
