@@ -6,9 +6,15 @@ import calculateNewCoordinates from './CoordinateCalc';
 
 const libraries: Library[] = ['places'];
 const halfDistance: number = 4;
-const bearings: number[] = [0, 25, 30, 45, 90, 120, 145, 160, 180, 210, 240, 280, 310, 360]
+
+function getRandomInt(min: number, max: number) {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+}
 
 const MapComponent: React.FC = () => {
+  const mapRef = useRef<GoogleMap | null>(null); 
   const [isError, setIsError] = useState<boolean>(false);
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [zoom, setZoom] = useState<number>(8);
@@ -41,11 +47,10 @@ const MapComponent: React.FC = () => {
     } else {
       //8km in 10k steps - 4km in 5k
       //distance between 2 points = acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371
-      const randomBearingIndex = Math.floor(Math.random() * bearings.length);
       let halfwayPoint = calculateNewCoordinates(coordinates.lat, coordinates.lng,
-                                                 halfDistance);
+                                                 halfDistance, getRandomInt(0, 360));
 
-      console.log(halfwayPoint.lat2, ", ", halfwayPoint.lon2);
+      console.log(halfwayPoint.dLat2, ", ", halfwayPoint.dLon2);
     }
   };
 
@@ -60,6 +65,7 @@ const MapComponent: React.FC = () => {
           <input className="text-binrojizome dark:text-binrojizome" type="text" placeholder="Enter your location" />
         </Autocomplete>
         <GoogleMap
+          ref={mapRef}
           mapContainerStyle={{ width: '100%', height: '600px' }}
           center={coordinates || { lat: -34.397, lng: 150.644 }}
           zoom={zoom}
