@@ -83,8 +83,7 @@ const MapComponent: React.FC = () => {
 
             const isInWater = addressComponents.some(component => component.short_name.length < 2) 
             || addressComponents.some(component => component.types.includes('water'))
-            || addressComponents.length < 2;
-            console.log("Addr", addressComponents);
+            || addressComponents.length < 3;
             resolve(isInWater);
           } else {
             resolve(false); 
