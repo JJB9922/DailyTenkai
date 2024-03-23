@@ -6,9 +6,14 @@ import {
   useMapsLibrary,
   useMap,
 } from '@vis.gl/react-google-maps'
+
+import {
+  fromAddress,
+} from "react-geocode";
+
 import calculateNewCoordinates from './CoordinateCalc';
 
-const halfDistance: number = 3.5;
+const halfDistance: number = 2;
 
 function getRandomInt(min: number, max: number) {
   const minCeiled = Math.ceil(min);
@@ -16,13 +21,37 @@ function getRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 }
 
-let startPos: google.maps.LatLngLiteral | null;
-let endPos: google.maps.LatLngLiteral | null;
+let globalStartPos: null | string;
+let globalEndPos: google.maps.LatLngLiteral | string;
 
 const MapComponent: React.FC = () => {
   const [isError, setIsError] = useState<boolean>(false);
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [startPos, setStartPos] = useState<google.maps.LatLngLiteral | null | string>(null);
+
   const position = { lat: 35.6895, lng: 139.6917 };
+
+  async function GenerateRoute() {
+    if (!startPos) {
+      setIsError(true);
+      setTimeout(() => {
+        setIsError(false);
+      }, 5000);
+      return;
+    }
+
+    fromAddress(startPos as string, process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '')
+      .then(({ results }) => {
+        const { lat, lng } = results[0].geometry.location;
+        setCoordinates({ lat, lng });
+        calculateRouteCoordinates();
+        globalStartPos = startPos as string;
+      })
+      .catch(console.error);
+
+    console.log(startPos);
+
+  };
 
   const calculateRouteCoordinates = () => {
     if (coordinates == null) {
@@ -36,17 +65,21 @@ const MapComponent: React.FC = () => {
     } else {
       //8km in 10k steps - 4km in 5k
       //distance between 2 points = acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371
-      let halfwayPoint = calculateNewCoordinates(coordinates.lat, coordinates.lng,
+      let halfwayPoint: google.maps.LatLngLiteral = calculateNewCoordinates(coordinates.lat, coordinates.lng,
         halfDistance, getRandomInt(0, 360));
 
-      console.log(halfwayPoint.dLat2, ", ", halfwayPoint.dLon2);
-      let lat = halfwayPoint.dLat2;
-      let lng = halfwayPoint.dLon2;
+      globalEndPos = halfwayPoint;
+
     }
   };
 
   return (
     <div>
+      <input
+        className='w-1/3 h-10 px-3 focus:outline-none'
+        onSubmit={(e) => { e.preventDefault(); }}
+        onChange={(e) => setStartPos(e.target.value)}
+      />
       <APIProvider
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
       >
@@ -69,11 +102,11 @@ const MapComponent: React.FC = () => {
       </APIProvider>
 
       <div className='flex md:flex-row flex-col py-4'>
-        <button type="button" className="dark:text-kachi text-shironeri bg-kachi dark:bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 shadow-[0_3px_10px_rgb(0,0,0,0.2)]" onClick={calculateRouteCoordinates}>Generate Route</button>
+        <button type="button" className="dark:text-kachi text-shironeri bg-kachi dark:bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 shadow-[0_3px_10px_rgb(0,0,0,0.2)]" onClick={GenerateRoute}>Generate Route</button>
 
         {isError && (
           <div className="flex flex-row px-4" role="alert">
-            <span className="text-lg text-ichigo dark:text-usubeni">Error! Please select a location.</span>
+            <span className="text-lg text-ichigo dark:text-usubeni">Error! Please enter a location.</span>
           </div>
         )}
       </div>
@@ -83,7 +116,7 @@ const MapComponent: React.FC = () => {
   );
 };
 
-function Directions() {
+const Directions = () => {
   const [isError, setIsError] = useState<boolean>(false);
   const map = useMap();
   const routesLibrary = useMapsLibrary("routes");
@@ -103,8 +136,8 @@ function Directions() {
     setDirectionsRenderer(new google.maps.DirectionsRenderer({ map }));
   }, [map, routesLibrary]);
 
-  useEffect(() => {
-    if (!directionsService || !directionsRenderer || !startPos || !endPos) {
+  const generateDirections = () => {
+    if (!directionsService || !directionsRenderer || !globalStartPos || !globalEndPos) {
       return;
     }
 
@@ -113,8 +146,8 @@ function Directions() {
       avoidHighways: true,
       avoidTolls: true,
 
-      origin: startPos,
-      destination: endPos,
+      origin: globalStartPos,
+      destination: globalEndPos,
 
       travelMode: google.maps.TravelMode.WALKING,
       provideRouteAlternatives: true,
@@ -130,7 +163,7 @@ function Directions() {
       }
     });
 
-  }, [directionsService, directionsRenderer]);
+  };
 
   useEffect(() => {
     if (!directionsRenderer || !routes[routeIndex]) {
@@ -140,27 +173,48 @@ function Directions() {
     directionsRenderer.setRouteIndex(routeIndex);
   }, [routeIndex]);
 
-  if (!leg) return null;
+  if (!leg) {
+    return (
+      <div>
+      <div className='bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi rounded w-2/3 lg:w-1/2 xl:w-1/3 p-4 shadow'>
+        <h2 className='underline'>Directions</h2>
+        <p>Enter a location and click Generate Route to get started.</p>
+        <button type='button'
+          onClick={generateDirections}
+          className='text-kachi dark:text-shironeri dark:bg-kachi bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 mt-4 shadow-[0_3px_10px_rgb(0,0,0,0.2)]'>
+          Generate Directions</button>
+      </div>
+      {isError && (
+          <div className="flex flex-row px-4" role="alert">
+            <span className="text-lg text-ichigo dark:text-usubeni">Error! Please enter a location.</span>
+          </div>
+        )}
+      </div>
+      
+    )
+  } else {
+    return (
+      <div className='bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi rounded w-2/3 lg:w-1/2 xl:w-1/3 p-4 shadow'>
+        <h2 className='underline'>{selected.summary}</h2>
+        <p>Distance: {leg.distance?.text}</p>
+        <p>Duration: {leg.duration?.text}</p>
 
-  return (
-    <div className='bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi rounded w-2/3 lg:w-1/2 xl:w-1/3 p-4 shadow'>
-      <h2 className='underline'>{selected.summary}</h2>
-      <p>Distance: {leg.distance?.text}</p>
-      <p>Expected Duration: {leg.duration?.text}</p>
+        <h2 className='underline my-2'>Other Routes</h2>
+        <ul>
+          {routes.map((route, index) => <li key={index}>
+            <button type="button"
+              className="my-2 text-kachi dark:text-shironeri dark:bg-kachi bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 shadow-[0_3px_10px_rgb(0,0,0,0.2)]"
+              onClick={() => setRouteIndex(index)}>
+              {route.summary}
+            </button>
+          </li>)}
+        </ul>
 
-      <h2 className='underline my-2'>Other Routes</h2>
-      <ul>
-        {routes.map((route, index) => <li key={index}>
-          <button type="button"
-            className="my-2 text-kachi dark:text-shironeri dark:bg-kachi bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 shadow-[0_3px_10px_rgb(0,0,0,0.2)]"
-            onClick={() => setRouteIndex(index)}>
-            {route.summary}
-          </button>
-        </li>)}
-      </ul>
-    </div>
+      </div>
+    );
+  };
 
-  );
+
 }
 
 export default MapComponent;

@@ -21,8 +21,8 @@ export default function calculateNewCoordinates(lat1: number, lon1: number, dist
     lat2 = Math.asin(Math.sin(rLat1)*Math.cos(distance/earthRadius) + Math.cos(rLat1)*Math.sin(distance/earthRadius)*Math.cos(rBearing));
     lon2 = rLon1 + Math.atan2(Math.sin(rBearing)*Math.sin(distance/earthRadius)*Math.cos(rLat1), Math.cos(distance/earthRadius)-Math.sin(rLat1)*Math.sin(lat2));
 
-    let dLat2 = toDegrees(lat2)
-    let dLon2 = toDegrees(lon2)
+    let lat = toDegrees(lat2)
+    let lng = toDegrees(lon2)
 
-    return { dLat2, dLon2 }
+    return { lat, lng }
 }
