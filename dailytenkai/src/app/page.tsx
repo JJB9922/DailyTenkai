@@ -24,9 +24,7 @@ export default function Home() {
 
 
         <div className='mb-32 w-2/3 md:px-24'>
-        <React.StrictMode>
-          <MapComponent />
-        </React.StrictMode>
+        <MapComponent />
         </div>
 
         </div>
