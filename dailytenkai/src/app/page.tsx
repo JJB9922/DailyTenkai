@@ -1,4 +1,4 @@
-
+import React from 'react';
 import ThemeToggle from './components/ThemeToggle';
 import 'material-icons/iconfont/material-icons.css';
 import MapComponent from './components/Map';
@@ -24,7 +24,9 @@ export default function Home() {
 
 
         <div className='mb-32 w-2/3 md:px-24'>
-          <MapComponent/>
+        <React.StrictMode>
+          <MapComponent />
+        </React.StrictMode>
         </div>
 
         </div>

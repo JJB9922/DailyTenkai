@@ -1,10 +1,8 @@
 'use client'
-import React, { useState, useRef } from 'react';
-// @ts-ignore: Annoying
-import { GoogleMap, LoadScript, Autocomplete, Library, Marker } from '@react-google-maps/api';
+import React, { useState } from 'react';
+import { APIProvider, Map, Marker, } from '@vis.gl/react-google-maps'
 import calculateNewCoordinates from './CoordinateCalc';
 
-const libraries: Library[] = ['places'];
 const halfDistance: number = 3.5;
 
 function getRandomInt(min: number, max: number) {
@@ -14,27 +12,8 @@ function getRandomInt(min: number, max: number) {
 }
 
 const MapComponent: React.FC = () => {
-  const mapRef = useRef<GoogleMap | null>(null);
   const [isError, setIsError] = useState<boolean>(false);
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
-  const [zoom, setZoom] = useState<number>(8);
-  const [markerPosition, setMarkerPosition] = useState<{ lat: number; lng: number } | null>(null);
-  const [markerPosition2, setMarkerPosition2] = useState<{ lat: number; lng: number } | null>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete>();
-
-  const handlePlaceSelect = () => {
-    const place = autocompleteRef.current?.getPlace();
-    console.log(place);
-    if (place && place.geometry && place.geometry.location) {
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      setCoordinates({ lat, lng });
-      setMarkerPosition({ lat, lng });
-      setZoom(12);
-    } else {
-      setZoom(8);
-    }
-  };
 
   const calculateRouteCoordinates = () => {
     if (coordinates == null) {
@@ -54,68 +33,25 @@ const MapComponent: React.FC = () => {
       console.log(halfwayPoint.dLat2, ", ", halfwayPoint.dLon2);
       let lat = halfwayPoint.dLat2;
       let lng = halfwayPoint.dLon2;
-
-      checkIfInWater(lat, lng)
-        .then((isInWater) => {
-          if (isInWater) {
-            calculateRouteCoordinates();
-          } else {
-            setMarkerPosition2({ lat, lng });
-          }
-        })
-        .catch((error) => {
-          console.error('Error checking if coordinates are in water:', error);
-        });
     }
   };
 
-  const checkIfInWater = (lat: number, lng: number) => {
-    return new Promise((resolve, reject) => {
-
-      const geocoder = new google.maps.Geocoder();
-      const latlng = new google.maps.LatLng(lat, lng);
-
-      geocoder.geocode({ 'location': latlng }, (results, status) => {
-        if (status === google.maps.GeocoderStatus.OK) {
-          if (results == null) return;
-          if (results[1]) {
-            const addressComponents = results[1].address_components;
-
-            const isInWater = addressComponents.some(component => component.short_name.length < 2) 
-            || addressComponents.some(component => component.types.includes('water'))
-            || addressComponents.length < 3;
-            resolve(isInWater);
-          } else {
-            resolve(false); 
-          }
-        } else {
-          reject(status);
-        }
-      });
-    });
-  };
-
-
   return (
     <div>
-      <LoadScript
-        googleMapsApiKey={process.env.
+      <APIProvider
+        apiKey={process.env.
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
-        libraries={libraries}
+        libraries={['places']}
       >
-        <Autocomplete onLoad={autocomplete => (autocompleteRef.current = autocomplete)} onPlaceChanged={handlePlaceSelect}>
-          <input className="text-binrojizome dark:text-binrojizome" type="text" placeholder="Enter your location" />
-        </Autocomplete>
-        <GoogleMap
-          ref={mapRef}
-          mapContainerStyle={{ width: '100%', height: '600px' }}
-          center={coordinates || { lat: -34.397, lng: 150.644 }}
-          zoom={zoom}
+        <Map
+          defaultCenter={coordinates || { lat: -34.397, lng: 150.644 }}
+          gestureHandling={'greedy'}
+          disableDefaultUI={true}
+          zoom={8}
+          style={{ width: '100%', height: '600px' }}
         >
-          {markerPosition && <Marker position={markerPosition} />}
-          {markerPosition2 && <Marker position={markerPosition2} />}
-        </GoogleMap>
-      </LoadScript>
+        </Map>
+      </APIProvider>
       <div className='flex md:flex-row flex-col items-center justify-between md:py-4 gap-4 py-4 px-4'>
         <p>Selected Coordinates: {coordinates ? `${coordinates.lat}, ${coordinates.lng}` : "None"}</p>
         <button type="button" className="dark:text-kachi text-shironeri bg-kachi dark:bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 shadow-[0_3px_10px_rgb(0,0,0,0.2)]" onClick={calculateRouteCoordinates}>Generate Route</button>
