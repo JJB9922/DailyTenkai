@@ -169,7 +169,7 @@ const MapComponent: React.FC = () => {
       )
     } else {
       return (
-        <div className='w-full p-4 bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi'>
+        <div className='w-full p-4 overflow-scroll bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi'>
           <h2 className='underline'>{selected.summary}</h2>
           <p>Distance: {leg.distance?.text}</p>
           <p>Duration: {leg.duration?.text}</p>
