@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import ThemeToggle from './components/ThemeToggle';
 import 'material-icons/iconfont/material-icons.css';
@@ -26,11 +27,24 @@ export default function Home() {
       <div className='flex justify-center dark:text-shironeri'> 
       <p>Any feedback?</p>
       <a className="underline gap-4 ml-4" href='mailto:jjb9922@protonmail.com'>Email me here.</a>
-      
       </div>
+
       <div className='flex justify-center mt-32'> 
         <iframe id='kofiframe' src='https://ko-fi.com/jjb9922/?hidefeed=true&widget=true&embed=true&preview=true' height='600' title='jjb9922'></iframe>
       </div>
+
+      <div className='flex flex-col items-center dark:text-shironeri mt-4'> 
+      <button type='button' className='underline' onClick={() => {
+        alert("bc1qf7w4tevzrp3rpz2ja6txw79hd62g6x5jn5j54g")
+      }}>BTC</button>
+      </div>
+
+      <div className='flex flex-col items-center dark:text-shironeri mt-4'> 
+      <button type='button' className='underline' onClick={() => {
+        alert("0xEF293830bbd9E4930b3300B16BBC2A68cE1503C6")
+      }}>ETH</button>
+      </div>
+
     </main>
   );
 }
