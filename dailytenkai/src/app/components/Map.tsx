@@ -141,7 +141,7 @@ const MapComponent: React.FC = () => {
       }
 
       directionsRenderer.setRouteIndex(routeIndex);
-    }, [routeIndex]);
+    }, [routeIndex, directionsRenderer, routes]);
 
     function clearRoutes() {
       directionsRenderer?.setMap(null);

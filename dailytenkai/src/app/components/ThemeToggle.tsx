@@ -33,7 +33,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
         setDarkMode(isDarkMode);
 
         document.documentElement.classList.toggle('dark');
-    }, []);
+    }, [storageKey]);
 
     const toggleDarkMode = () => {
         const newDarkMode = !darkMode;
