@@ -5,7 +5,7 @@ import MapComponent from './components/Map';
 
 export default function Home() {
   return (
-    <main className="h-full w-screen bg-shironeri dark:bg-kachi px-4 py-8 overflow-auto">
+    <main className="md:h-screen h-full w-screen bg-shironeri dark:bg-kachi px-4 py-8 overflow-auto">
       <div className='flex flex-col items-center justify-center mb-8'>
         <div className='flex flex-row items-center justify-between w-full'>
           <ThemeToggle />
