@@ -206,7 +206,7 @@ const MapComponent: React.FC = () => {
         className='w-full h-10 px-3 focus:outline-none dark:text-kachi text-shironeri dark:bg-shironeri bg-kachi'
         onSubmit={(e) => { e.preventDefault(); }}
         onChange={(e) => handleInputChange(e)}
-        placeholder='Enter a location...'
+        placeholder='Enter a start location...'
       />
       <APIProvider
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}

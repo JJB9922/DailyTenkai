@@ -15,7 +15,7 @@ export default function Home() {
       </div>
 
       <div className='text-kachi dark:text-shironeri text-center mb-8'>
-        <p>Give Daily Tenkai a location, and it will calculate a 10,000 step route for you to take.</p>
+        <p>Give Daily Tenkai a starting location, and it will calculate a ~10,000 step route for you to take.</p>
         <p>Simply plug the output address into your phone or GPS, then head there and back.</p>
       </div>
 
