@@ -24,10 +24,18 @@ export default function Home() {
 
 
         <div className='mb-32 w-2/3 md:px-24'>
-        <MapComponent />
+          <MapComponent />
         </div>
 
         </div>
+
+    <div className='flex flex-col items-center gap-4 text-kachi dark:text-shironeri py-16'>
+    <h2> Developer Notes - Stuff in Progress</h2>
+    <ul>
+      <li> - Crime heatmap </li>
+      <li> - Weather </li>
+    </ul>
+    </div>
     </main>
   );
 }
