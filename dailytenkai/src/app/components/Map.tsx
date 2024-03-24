@@ -212,8 +212,8 @@ const MapComponent: React.FC = () => {
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
       >
 
-        <div className='grid grid-cols-4'>
-          <div className='col-span-3'>
+        <div className='flex flex-col md:grid md:grid-cols-4'>
+          <div className='flex-col md:col-span-3'>
             <Map
               defaultCenter={position}
               defaultZoom={8}
@@ -224,7 +224,7 @@ const MapComponent: React.FC = () => {
               style={{ width: '100%', height: '50vh' }}
             ></Map>
           </div>
-          <div className='col-span-1 w-full'>
+          <div className='flex-col md:col-span-1 w-full'>
             <Directions />
           </div>
         </div>

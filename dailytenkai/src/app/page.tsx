@@ -2,15 +2,14 @@ import React from 'react';
 import ThemeToggle from './components/ThemeToggle';
 import 'material-icons/iconfont/material-icons.css';
 import MapComponent from './components/Map';
-import Image from 'next/image';
 
 export default function Home() {
   return (
-    <main className="h-screen w-screen bg-shironeri dark:bg-kachi px-4 py-8">
+    <main className="h-full w-screen bg-shironeri dark:bg-kachi px-4 py-8 overflow-auto">
       <div className='flex flex-col items-center justify-center mb-8'>
         <div className='flex flex-row items-center justify-between w-full'>
           <ThemeToggle />
-          <Image src="/Logo.png" alt="Logo" className="w-8 h-8 ml-2 dark:invert" />
+          <img src="/Logo.png" alt="Logo" className="w-8 h-8 ml-2 dark:invert" />
         </div>
         <h1 className='text-2xl text-center text-kachi dark:text-shironeri'>Daily Tenkai</h1>
       </div>
