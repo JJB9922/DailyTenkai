@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const MoonIcon = () => {
     return (
@@ -31,8 +31,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
     useEffect(() => {
         const isDarkMode = localStorage.getItem(storageKey) === 'true';
         setDarkMode(isDarkMode);
-
-        document.documentElement.classList.toggle('dark');
+        document.documentElement.classList.toggle('dark', isDarkMode);
     }, [storageKey]);
 
     const toggleDarkMode = () => {
@@ -44,7 +43,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
 
 
     return (
-        <button onClick={toggleDarkMode}>
+        <button onClick={toggleDarkMode} className={darkMode ? 'dark' : ''}>
             {darkMode ? <SunIcon /> : <MoonIcon />}
         </button>
     );

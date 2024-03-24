@@ -23,7 +23,7 @@ export default function Home() {
         <MapComponent />
       </div>
 
-      <div className='flex justify-center'> 
+      <div className='flex justify-center dark:text-shironeri'> 
       <p>Any feedback?</p>
       <a className="underline gap-4 ml-4" href='mailto:jjb9922@protonmail.com'>Email me here.</a>
       
