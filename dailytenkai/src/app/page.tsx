@@ -22,6 +22,15 @@ export default function Home() {
       <div className='mb-8'>
         <MapComponent />
       </div>
+
+      <div className='flex justify-center'> 
+      <p>Any feedback?</p>
+      <a className="underline gap-4 ml-4" href='mailto:jjb9922@protonmail.com'>Email me here.</a>
+      
+      </div>
+      <div className='flex justify-center mt-32'> 
+        <iframe id='kofiframe' src='https://ko-fi.com/jjb9922/?hidefeed=true&widget=true&embed=true&preview=true' height='600' title='jjb9922'></iframe>
+      </div>
     </main>
   );
 }
