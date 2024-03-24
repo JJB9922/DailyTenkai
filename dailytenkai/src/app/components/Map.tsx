@@ -29,9 +29,15 @@ const MapComponent: React.FC = () => {
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [startPos, setStartPos] = useState<google.maps.LatLngLiteral | null | string>(null);
 
-  const position = { lat: 35.6895, lng: 139.6917 };
+  const position = { lat: 51.5098, lng: 0.1180 };
+
+  useEffect(() => {
+    setStartPos(startPos);
+    //console.log(startPos)
+   }, [startPos]);
 
   async function GenerateRoute() {
+
     if (!startPos) {
       setIsError(true);
       setTimeout(() => {
@@ -40,38 +46,37 @@ const MapComponent: React.FC = () => {
       return;
     }
 
-    fromAddress(startPos as string, process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '')
+    await fromAddress(startPos as string, process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '')
       .then(({ results }) => {
         const { lat, lng } = results[0].geometry.location;
+        if(!lat || !lng) {
+          setIsError(true);
+          setTimeout(() => {
+            setIsError(false);
+          }, 5000);
+        } else {
         setCoordinates({ lat, lng });
-        calculateRouteCoordinates();
         globalStartPos = startPos as string;
+        }
+
       })
       .catch(console.error);
 
-    console.log(startPos);
-
   };
 
-  const calculateRouteCoordinates = () => {
-    if (coordinates == null) {
-
-      setIsError(true);
-      setTimeout(() => {
-        setIsError(false);
-      }, 5000);
-
+  useEffect(() => {
+    if (!coordinates) {
       return;
-    } else {
-      //8km in 10k steps - 4km in 5k
-      //distance between 2 points = acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371
-      let halfwayPoint: google.maps.LatLngLiteral = calculateNewCoordinates(coordinates.lat, coordinates.lng,
-        halfDistance, getRandomInt(0, 360));
-
-      globalEndPos = halfwayPoint;
-
     }
-  };
+
+    //8km in 10k steps - 4km in 5k
+    //distance between 2 points = acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371
+    let halfwayPoint: google.maps.LatLngLiteral = calculateNewCoordinates(coordinates.lat, coordinates.lng,
+      halfDistance, getRandomInt(0, 360));
+
+    globalEndPos = halfwayPoint;
+
+  }, [coordinates]);
 
   return (
     <div>
@@ -106,7 +111,7 @@ const MapComponent: React.FC = () => {
 
         {isError && (
           <div className="flex flex-row px-4" role="alert">
-            <span className="text-lg text-ichigo dark:text-usubeni">Error! Please enter a location.</span>
+            <span className="text-lg text-ichigo dark:text-usubeni">Error! Please enter a valid location.</span>
           </div>
         )}
       </div>
