@@ -28,7 +28,6 @@ const MapComponent: React.FC = () => {
   const [isError, setIsError] = useState<boolean>(false);
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [startPos, setStartPos] = useState<google.maps.LatLngLiteral | null | string>(null);
-  const [findingLocation, setFindingLocation] = useState<boolean>(false);
 
   const position = { lat: 51.5098, lng: 0.1180 };
 
@@ -46,8 +45,6 @@ const MapComponent: React.FC = () => {
       return;
     }
 
-    setFindingLocation(true);
-
     await fromAddress(startPos as string, process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '')
       .then(({ results }) => {
         const { lat, lng } = results[0].geometry.location;
@@ -59,9 +56,6 @@ const MapComponent: React.FC = () => {
         } else {
           setCoordinates({ lat, lng });
           globalStartPos = startPos as string;
-          setTimeout(() => {
-            setFindingLocation(false); // Reset state after 5 seconds
-          }, 5000);
         }
 
       })
@@ -131,7 +125,6 @@ const MapComponent: React.FC = () => {
         if (status === google.maps.DirectionsStatus.OK && result) {
           directionsRenderer.setDirections(result);
           setRoutes(result.routes);
-          alert('Success! Please click "Generate Directions" for a route.');
         } else {
           setIsError(true);
           setTimeout(() => {
@@ -218,7 +211,7 @@ const MapComponent: React.FC = () => {
       <APIProvider
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
       >
-      <div className='w-screen grid grid-cols-2 gap-4'>
+        <div className='w-screen grid grid-cols-2 gap-4'>
           <div className='w-full h-96 max-h-96'>
             <Map
               defaultCenter={position}
@@ -237,12 +230,8 @@ const MapComponent: React.FC = () => {
       </APIProvider>
 
       <div className='flex md:flex-row flex-col py-4'>
-        {findingLocation ? (
-          <p>Finding location...</p>
-        ) : (
-          <button type="button" className="dark:text-kachi text-shironeri bg-kachi dark:bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 shadow-[0_3px_10px_rgb(0,0,0,0.2)]" onClick={GenerateRoute}>Generate Route</button>
+        <button type="button" className="dark:text-kachi text-shironeri bg-kachi dark:bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 shadow-[0_3px_10px_rgb(0,0,0,0.2)]" onClick={GenerateRoute}>Generate Route</button>
 
-        )}
 
         {isError && (
           <div className="flex flex-row px-4" role="alert">
