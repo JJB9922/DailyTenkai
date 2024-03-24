@@ -30,29 +30,35 @@ const MapComponent: React.FC = () => {
   const [startPos, setStartPos] = useState<google.maps.LatLngLiteral | null | string>(null);
 
   const position = { lat: 51.5098, lng: 0.1180 };
+  const debouncedGenerateRoute = debounce(GenerateRoute, 500);   
 
-  useEffect(() => {
-    setStartPos(startPos);
-  }, [startPos]);
+  function debounce(func: any, wait: any) {
+    let timeout: any;
+    return function executedFunction(...args: any) {
+      const later = () => {
+        timeout = null;
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
 
-  async function GenerateRoute() {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+      setStartPos(e.target.value);
+      debouncedGenerateRoute();
+    }
 
+  function GenerateRoute() {
     if (!startPos) {
-      setIsError(true);
-      setTimeout(() => {
-        setIsError(false);
-      }, 5000);
+
       return;
     }
 
-    await fromAddress(startPos as string, process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '')
+    fromAddress(startPos as string, process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '')
       .then(({ results }) => {
         const { lat, lng } = results[0].geometry.location;
         if (!lat || !lng) {
-          setIsError(true);
-          setTimeout(() => {
-            setIsError(false);
-          }, 5000);
         } else {
           setCoordinates({ lat, lng });
           globalStartPos = startPos as string;
@@ -61,10 +67,6 @@ const MapComponent: React.FC = () => {
       })
       .catch((error) => {
         console.error(error)
-        setIsError(true);
-        setTimeout(() => {
-          setIsError(false);
-        }, 5000);
       });
 
   };
@@ -73,7 +75,6 @@ const MapComponent: React.FC = () => {
     if (!coordinates) {
       return;
     }
-
     //8km in 10k steps - 4km in 5k
     //distance between 2 points = acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371
     let halfwayPoint: google.maps.LatLngLiteral = calculateNewCoordinates(coordinates.lat, coordinates.lng,
@@ -103,8 +104,12 @@ const MapComponent: React.FC = () => {
       setDirectionsRenderer(new google.maps.DirectionsRenderer({ map }));
     }, [map, routesLibrary]);
 
-    const generateDirections = () => {
+    function generateDirections() {
       if (!directionsService || !directionsRenderer || !globalStartPos || !globalEndPos) {
+        setIsError(true);
+        setTimeout(() => {
+          setIsError(false);
+        }, 5000);
         return;
       }
 
@@ -125,11 +130,6 @@ const MapComponent: React.FC = () => {
         if (status === google.maps.DirectionsStatus.OK && result) {
           directionsRenderer.setDirections(result);
           setRoutes(result.routes);
-        } else {
-          setIsError(true);
-          setTimeout(() => {
-            setIsError(false);
-          }, 5000);
         }
       });
 
@@ -151,7 +151,7 @@ const MapComponent: React.FC = () => {
     if (!leg) {
       return (
         <div>
-          <div className='bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi rounded w-2/3 lg:w-1/2 xl:w-1/3 p-4 shadow'>
+          <div className='w-full p-4 overflow-scroll bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi'>
             <h2 className='underline'>Directions</h2>
             <p>Enter a location and click Generate Route to get started.</p>
             <button type='button'
@@ -160,7 +160,7 @@ const MapComponent: React.FC = () => {
               Generate Directions</button>
           </div>
           {isError && (
-            <div className="flex flex-row px-4" role="alert">
+            <div className="flex flex-row p-4" role="alert">
               <span className="text-lg text-ichigo dark:text-usubeni">Error! Please enter a location.</span>
             </div>
           )}
@@ -169,7 +169,7 @@ const MapComponent: React.FC = () => {
       )
     } else {
       return (
-        <div className='bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi rounded w-2/3 lg:w-1/2 xl:w-1/3 p-4 shadow'>
+        <div className='w-full p-4 bg-kachi text-shironeri dark:bg-shironeri dark:text-kachi'>
           <h2 className='underline'>{selected.summary}</h2>
           <p>Distance: {leg.distance?.text}</p>
           <p>Duration: {leg.duration?.text}</p>
@@ -203,16 +203,17 @@ const MapComponent: React.FC = () => {
   return (
     <div>
       <input
-        className='w-1/3 h-10 px-3 focus:outline-none dark:text-kachi text-shironeri dark:bg-shironeri bg-kachi'
+        className='w-full h-10 px-3 focus:outline-none dark:text-kachi text-shironeri dark:bg-shironeri bg-kachi'
         onSubmit={(e) => { e.preventDefault(); }}
-        onChange={(e) => setStartPos(e.target.value)}
+        onChange={(e) => handleInputChange(e)}
         placeholder='Enter a location...'
       />
       <APIProvider
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
       >
-        <div className='w-screen grid grid-cols-2 gap-4'>
-          <div className='w-full h-96 max-h-96'>
+
+        <div className='grid grid-cols-4'>
+          <div className='col-span-3'>
             <Map
               defaultCenter={position}
               defaultZoom={8}
@@ -220,25 +221,21 @@ const MapComponent: React.FC = () => {
               fullscreenControl={false}
               streetViewControl={false}
               mapTypeControl={false}
+              style={{ width: '100%', height: '50vh' }}
             ></Map>
           </div>
-          <div className='h-96 overflow-auto'>
+          <div className='col-span-1 w-full'>
             <Directions />
           </div>
         </div>
 
       </APIProvider>
 
-      <div className='flex md:flex-row flex-col py-4'>
-        <button type="button" className="dark:text-kachi text-shironeri bg-kachi dark:bg-shironeri hover:shadow-[0_5px_12px_rgb(0,0,0,0.2)] rounded-lg px-5 py-2.5 shadow-[0_3px_10px_rgb(0,0,0,0.2)]" onClick={GenerateRoute}>Generate Route</button>
-
-
-        {isError && (
-          <div className="flex flex-row px-4" role="alert">
-            <span className="text-lg text-ichigo dark:text-usubeni">Error! The location is unreachable - please add a city to the location.</span>
-          </div>
-        )}
-      </div>
+      {isError && (
+        <div className="flex flex-row px-4" role="alert">
+          <span className="text-lg text-ichigo dark:text-usubeni">Error! The location is unreachable - please add a city to the location.</span>
+        </div>
+      )}
 
 
     </div>
