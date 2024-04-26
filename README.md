@@ -1,9 +1,9 @@
 # DailyTenkai
 A webapp that allows you to enter a location and receive a route that covers ~10k steps, door to door
 
-# Screenshots
+Note: No longer actively hosted as the GCP free trial has run out. To use, clone this and replace ```process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY``` with a working API key to the google maps API.
 
-I have decided to include some screenshots since the google maps API will run out and break the site as soon as my free trial runs out!
+# Screenshots
 
 
 Landing page (Light / Dark):
